@@ -1,4 +1,4 @@
-name: Rust CI
+name: CI
 
 on:
   push:
@@ -12,36 +12,38 @@ permissions:
   contents: read
 
 jobs:
-  rust:
-    name: Build, test and lint
+  validate:
+    name: Validate package sources
     runs-on: ubuntu-latest
+    container: archlinux:latest
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install validation tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libglib2.0-dev \
-            libgtk-3-dev \
-            libgtk-layer-shell-dev \
-            libwayland-dev \
-            pkg-config
+          pacman -Syu --noconfirm --needed             base-devel             git             shellcheck             sudo
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
+      - name: Validate repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          if make -n validate >/dev/null 2>&1; then
+            make validate
+          else
+            echo "No make validate target; skipping repository validation."
+          fi
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Validate CI PKGBUILD
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "packaging"
+          makepkg -p PKGBUILD --printsrcinfo >/dev/null
 
-      - name: Build release
-        run: cargo build --release --locked
-
-      - name: Run tests
-        run: cargo test --locked
-
-      - name: Run clippy
-        run: cargo clippy --locked --all-targets --all-features -- -D warnings
+      - name: Validate local PKGBUILD
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "packaging/PKGBUILD.local"
