@@ -25,3 +25,4 @@ test:
 
 clean:
 	cargo clean
+	rm -f packaging/arch/*.zst packaging/arch/*.tar.gz
