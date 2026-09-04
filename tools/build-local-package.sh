@@ -2,7 +2,6 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-REPO_ROOT="$(cd "$ROOT_DIR/.." && pwd)"
 
 if [[ -f "$ROOT_DIR/packaging/arch/PKGBUILD.local" ]]; then
   PACKAGING_DIR="$ROOT_DIR/packaging/arch"
@@ -57,9 +56,9 @@ packages="$(find "$PACKAGING_DIR" -maxdepth 1 -type f -name "${pkgname}-*.pkg.ta
 if [[ -n "$packages" ]]; then
   printf 'Packages created:\n%s\n' "$packages"
 
-  DIST_DIR="$REPO_ROOT/dist"
+  DIST_DIR="$ROOT_DIR/dist"
   mkdir -p "$DIST_DIR"
-  cp $packages "$DIST_DIR/"
-  printf 'Copied to %s:\n' "$DIST_DIR"
+  mv -f $packages "$DIST_DIR/"
+  printf 'Moved to %s:\n' "$DIST_DIR"
   printf '%s\n' "$packages" | xargs -I{} basename {}
 fi

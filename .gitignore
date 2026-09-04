@@ -1,3 +1,4 @@
 /target/
 *.zst
 argvus*.tar.gz
+/dist/
