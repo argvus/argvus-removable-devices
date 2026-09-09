@@ -17,8 +17,7 @@ depends=(
   'xdg-utils'
 )
 optdepends=(
-  'rofi: dmenu-style fallback menu mode'
-  'wofi: dmenu-style fallback menu mode'
+  'argvus-launcher: Rofi dmenu-style fallback menu mode'
 )
 makedepends=(
   'cargo'
