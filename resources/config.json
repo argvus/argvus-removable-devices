@@ -34,12 +34,12 @@
   //   {model} {state}   (state = "Encrypted · Locked" / "Read-only", ...)
   "tooltip_format": "{name}\n{state}\n{fs} · {capacity}\n{used} used · {free} free\n{mount}",
 
-  // Font Awesome 7 Free glyphs (icon_size is accepted for compatibility but
+  // Symbols Nerd Font glyphs (icon_size is accepted for compatibility but
   // unused in text mode — the waybar label is a normal text label).
   "icons": {
-    "mounted": "\uf0a0",    // hard-drive
-    "unmounted": "\uf0a0",  // hard-drive
-    "encrypted": "\uf023",  // lock
-    "read_only": "\uf023"   // lock
+    "mounted": "󰕓",    // md-harddisk
+    "unmounted": "󰕓",  // md-harddisk
+    "encrypted": "󰍁",  // md-lock-outline
+    "read_only": "󰍁"   // md-lock-outline
   }
 }

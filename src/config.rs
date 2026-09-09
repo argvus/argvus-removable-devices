@@ -45,10 +45,10 @@ impl Default for Config {
             mode: "rofi".to_string(),
             menu: "rofi".to_string(),
             menu_flags: "-dmenu -i -p Storage".to_string(),
-            icons_mounted: "\u{f0a0}".to_string(),
-            icons_unmounted: "\u{f0a0}".to_string(),
-            icons_encrypted: "\u{f023}".to_string(),
-            icons_read_only: "\u{f023}".to_string(),
+            icons_mounted: "\u{f02ca}".to_string(),
+            icons_unmounted: "\u{f02ca}".to_string(),
+            icons_encrypted: "\u{f0341}".to_string(),
+            icons_read_only: "\u{f0341}".to_string(),
         }
     }
 }
@@ -318,7 +318,7 @@ mod tests {
         assert_eq!(cfg.sort, "mount_time");
         assert_eq!(cfg.format, "{icon}");
         assert_eq!(cfg.file_manager_command, "xdg-open");
-        assert_eq!(cfg.icons_mounted, "\u{f0a0}");
+        assert_eq!(cfg.icons_mounted, "\u{f02ca}");
     }
 
     #[test]
