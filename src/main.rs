@@ -24,9 +24,9 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn print_usage(out: &mut dyn Write) {
     let usage = i18n::tr(
-            "argvus-storage {VERSION} - removable storage module for waybar (UDisks2)\n\
+            "argvus-taskbar-storage {VERSION} - removable storage module for waybar (UDisks2)\n\
              \n\
-             Usage: argvus-storage [options] <command> [device]\n\
+             Usage: argvus-taskbar-storage [options] <command> [device]\n\
              \n\
              Commands:\n\
              \x20 watch        emit a JSON line for waybar whenever devices change (default)\n\
@@ -52,9 +52,9 @@ fn print_usage(out: &mut dyn Write) {
              \x20 --y <px>        pin the menu Y to a position (gui mode)\n\
              \x20 -h, --help       show this help\n\
              \x20 -v, --version    print the version",
-            "argvus-storage {VERSION} - módulo de armazenamento removível para waybar (UDisks2)\n\
+            "argvus-taskbar-storage {VERSION} - módulo de armazenamento removível para waybar (UDisks2)\n\
              \n\
-             Uso: argvus-storage [opções] <comando> [dispositivo]\n\
+             Uso: argvus-taskbar-storage [opções] <comando> [dispositivo]\n\
              \n\
              Comandos:\n\
              \x20 watch        emite uma linha JSON para a waybar quando os dispositivos mudam (padrão)\n\
@@ -88,7 +88,7 @@ fn print_usage(out: &mut dyn Write) {
 pub(crate) async fn snapshot(cfg: &Config) -> Vec<Device> {
     let mut client = UdisksClient::new();
     if !client.connect().await {
-        eprintln!("argvus-storage: {}", client.last_error());
+        eprintln!("argvus-taskbar-storage: {}", client.last_error());
         return Vec::new();
     }
     let raw = client.enumerate().await;
@@ -136,7 +136,7 @@ async fn run_watch(cfg: &Config, once: bool) -> i32 {
     match monitor.run(emit).await {
         Ok(()) => 0,
         Err(e) => {
-            eprintln!("argvus-storage: {}", e);
+            eprintln!("argvus-taskbar-storage: {}", e);
             1
         }
     }
@@ -157,7 +157,7 @@ async fn run_action(cfg: &Config, cmd: &str, token: &str) -> i32 {
     let devs = snapshot(cfg).await;
     let Some(d) = pick(&devs, token) else {
         eprintln!(
-            "argvus-storage: {}",
+            "argvus-taskbar-storage: {}",
             i18n::tr(
                 "no removable storage devices",
                 "nenhum dispositivo de armazenamento removível"
@@ -204,7 +204,7 @@ async fn main() {
             i += 1;
             if i >= args.len() {
                 eprintln!(
-                    "argvus-storage: {}",
+                    "argvus-taskbar-storage: {}",
                     i18n::tr("--config requires a path", "--config exige um caminho")
                 );
                 std::process::exit(2);
@@ -214,7 +214,7 @@ async fn main() {
             i += 1;
             if i >= args.len() {
                 eprintln!(
-                    "argvus-storage: {}",
+                    "argvus-taskbar-storage: {}",
                     i18n::tr("--x requires a value", "--x exige um valor")
                 );
                 std::process::exit(2);
@@ -224,7 +224,7 @@ async fn main() {
             i += 1;
             if i >= args.len() {
                 eprintln!(
-                    "argvus-storage: {}",
+                    "argvus-taskbar-storage: {}",
                     i18n::tr("--y requires a value", "--y exige um valor")
                 );
                 std::process::exit(2);
@@ -234,7 +234,7 @@ async fn main() {
             print_usage(&mut std::io::stdout());
             return;
         } else if arg == "-v" || arg == "--version" {
-            println!("argvus-storage {}", VERSION);
+            println!("argvus-taskbar-storage {}", VERSION);
             return;
         } else {
             positional.push(arg.clone());
@@ -277,7 +277,7 @@ async fn main() {
     };
     if code == -1 {
         eprintln!(
-            "argvus-storage: {}",
+            "argvus-taskbar-storage: {}",
             i18n::tr(
                 &format!("unknown command '{}'", cmd),
                 &format!("comando desconhecido '{}'", cmd)

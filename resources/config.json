@@ -1,12 +1,12 @@
 {
-  // Argvus — removable storage module (argvus-storage) system defaults.
+  // Argvus — removable storage module (argvus-taskbar-storage) system defaults.
   //
-  // This file is installed at /etc/argvus-storage/config.json.
-  // To customize, copy it to ~/.config/argvus-storage/config.json and
-  // edit; user settings override these defaults. All keys are optional.
+  // This file is installed at /etc/argvus/taskbar/storage/config.json.
+  // To customize, copy it to ~/.config/argvus/taskbar/storage/config.json
+  // and edit; user settings override these defaults. All keys are optional.
   //
   // GTK popup menu styling (mode = "gui") lives in the sibling theme.css
-  // file, not here. Copy it to ~/.config/argvus-storage/theme.css to
+  // file, not here. Copy it to ~/.config/argvus/taskbar/storage/theme.css to
   // customize the look; user rules override the system ones.
   //
   // Comments are allowed and ignored.

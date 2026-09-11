@@ -1,10 +1,10 @@
 # Maintainer: William C. Canin
-pkgname=argvus-storage
+pkgname=argvus-taskbar-storage
 pkgver=0.2.0
 pkgrel=1
 pkgdesc="Removable storage module for Waybar, written in Rust for the Argvus desktop"
 arch=('x86_64')
-url="https://github.com/argvus/argvus-storage"
+url="https://github.com/argvus/argvus-taskbar-storage"
 license=('GPL-3.0-only')
 options=('!debug')
 depends=(
@@ -24,13 +24,13 @@ makedepends=(
   'pkgconf'
 )
 backup=(
-  'etc/argvus-storage/config.json'
-  'etc/argvus-storage/theme.css'
-  'etc/argvus-storage/themes/argvus-dark-silver.css'
-  'etc/argvus-storage/themes/argvus-dark-aether.css'
-  'etc/argvus-storage/themes/argvus-light-veil.css'
-  'etc/argvus-storage/themes/argvus-dark-slate.css'
-  'etc/argvus-storage/themes/argvus-dark-universe.css'
+  'etc/argvus/taskbar/storage/config.json'
+  'etc/argvus/taskbar/storage/theme.css'
+  'etc/argvus/taskbar/storage/themes/argvus-dark-silver.css'
+  'etc/argvus/taskbar/storage/themes/argvus-dark-aether.css'
+  'etc/argvus/taskbar/storage/themes/argvus-light-veil.css'
+  'etc/argvus/taskbar/storage/themes/argvus-dark-slate.css'
+  'etc/argvus/taskbar/storage/themes/argvus-dark-universe.css'
 )
 source=("${pkgname}-${pkgver}.tar.gz")
 sha256sums=("SKIP")
@@ -59,12 +59,12 @@ package() {
     "${pkgdir}/usr/share/argvus/scripts/apps/hypr-storage-menu.sh"
 
   install -Dm644 resources/config.json \
-    "${pkgdir}/etc/${pkgname}/config.json"
+    "${pkgdir}/etc/argvus/taskbar/storage/config.json"
   install -Dm644 resources/theme.css \
-    "${pkgdir}/etc/${pkgname}/theme.css"
+    "${pkgdir}/etc/argvus/taskbar/storage/theme.css"
 
-  install -dm755 "${pkgdir}/etc/${pkgname}/themes"
-  install -m644 resources/themes/*.css "${pkgdir}/etc/${pkgname}/themes/"
+  install -dm755 "${pkgdir}/etc/argvus/taskbar/storage/themes"
+  install -m644 resources/themes/*.css "${pkgdir}/etc/argvus/taskbar/storage/themes/"
 
   install -Dm644 LICENSE \
     "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"

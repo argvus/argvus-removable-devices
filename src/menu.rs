@@ -82,7 +82,7 @@ impl<'a> Menu<'a> {
 
         if entries.is_empty() {
             util::notify(
-                "argvus-storage",
+                "argvus-taskbar-storage",
                 i18n::tr(
                     "No removable storage devices",
                     "Nenhum dispositivo de armazenamento removível",
@@ -119,7 +119,7 @@ impl<'a> Menu<'a> {
     pub async fn run_devices(&self, devices: &[Device]) -> i32 {
         if devices.is_empty() {
             util::notify(
-                "argvus-storage",
+                "argvus-taskbar-storage",
                 i18n::tr(
                     "No removable storage devices",
                     "Nenhum dispositivo de armazenamento removível",

@@ -1,5 +1,5 @@
-const SYSTEM_CONFIG: &str = "/etc/argvus-storage/config.json";
-const SYSTEM_THEME: &str = "/etc/argvus-storage/theme.css";
+const SYSTEM_CONFIG: &str = "/etc/argvus/taskbar/storage/config.json";
+const SYSTEM_THEME: &str = "/etc/argvus/taskbar/storage/theme.css";
 #[derive(Clone)]
 pub struct Config {
     pub show_name: bool,
@@ -55,7 +55,7 @@ impl Default for Config {
 
 impl Config {
     // Load config merging (in order): system defaults, user config
-    // ($XDG_CONFIG_HOME/argvus-storage/config.json), explicit
+    // ($XDG_CONFIG_HOME/argvus/taskbar/storage/config.json), explicit
     // --config path. Missing files are ignored; invalid JSON is skipped with a
     // warning.
     pub fn load(explicit_path: &str) -> Config {
@@ -104,7 +104,7 @@ fn load_json(path: &str) -> Option<serde_json::Value> {
         Ok(v) => Some(v),
         Err(e) => {
             eprintln!(
-                "argvus-storage: {} {}: {}",
+                "argvus-taskbar-storage: {} {}: {}",
                 crate::i18n::tr("ignoring invalid config", "ignorando configuração inválida"),
                 path,
                 e
@@ -199,12 +199,18 @@ fn user_config_dir() -> Option<String> {
     if let Some(xdg) = std::env::var_os("XDG_CONFIG_HOME")
         && !xdg.is_empty()
     {
-        return Some(format!("{}/argvus-storage", xdg.to_string_lossy()));
+        return Some(format!(
+            "{}/argvus/taskbar/storage",
+            xdg.to_string_lossy()
+        ));
     }
     if let Some(home) = std::env::var_os("HOME")
         && !home.is_empty()
     {
-        return Some(format!("{}/.config/argvus-storage", home.to_string_lossy()));
+        return Some(format!(
+            "{}/.config/argvus/taskbar/storage",
+            home.to_string_lossy()
+        ));
     }
     None
 }

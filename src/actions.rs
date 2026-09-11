@@ -231,8 +231,8 @@ impl<'a> Actions<'a> {
         };
         if let Err(e) = result {
             err = e;
-            util::notify("argvus-storage", &err, true);
-            eprintln!("argvus-storage: {}", err);
+            util::notify("argvus-taskbar-storage", &err, true);
+            eprintln!("argvus-taskbar-storage: {}", err);
             return 1;
         }
         0

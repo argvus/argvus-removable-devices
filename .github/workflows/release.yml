@@ -68,7 +68,7 @@ jobs:
 
           sudo -u builder env GITHUB_WORKSPACE="$GITHUB_WORKSPACE" bash -lc             'cd "$GITHUB_WORKSPACE/packaging/arch" && makepkg --nodeps --noconfirm --needed --cleanbuild --clean'
 
-          pkg_file="$(find "packaging/arch" -maxdepth 1 -type f -name 'argvus-storage-*.pkg.tar.zst' -print -quit)"
+          pkg_file="$(find "packaging/arch" -maxdepth 1 -type f -name 'argvus-taskbar-storage-*.pkg.tar.zst' -print -quit)"
           if [[ -z "$pkg_file" ]]; then
             echo "Package file was not created." >&2
             exit 1
@@ -172,5 +172,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Publish argvus-storage ${{ steps.version.outputs.version }}"
+          git commit -m "Publish argvus-taskbar-storage ${{ steps.version.outputs.version }}"
           git push
