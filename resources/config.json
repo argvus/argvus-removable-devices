@@ -26,7 +26,10 @@
   "copy_command": "wl-copy",
   "unlock_command": "kitty -e",   // prefix used to open a terminal for the LUKS passphrase
   "mode": "gui",                  // gui = GTK context menu on right click | rofi = dmenu-style list
-  "menu": "rofi",                 // rofi | dmenu (only used when mode = rofi)
+  "menu": "rofi",                 // rofi | wofi | dmenu (only used when mode = rofi)
+  // rofi mode auto-resolves the ARGVUS theme (-config <argvus>/rofi/config.rasi),
+  // uses the "-p" value as a base prompt, and navigates devices -> actions with
+  // arrows (Right = open submenu, Esc/Left in the submenu = go back).
   "menu_flags": "-dmenu -i -p Storage",
 
   // Tokens for "format" and "tooltip_format":

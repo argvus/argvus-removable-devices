@@ -256,17 +256,18 @@ async fn main() {
         "list" => run_list(&snapshot(&cfg).await),
         "menu" => {
             let devs = snapshot(&cfg).await;
-            if cfg.mode == "gui" {
-                match fixed_x.zip(fixed_y) {
-                    Some(pos) => gui::run(&cfg, &devs, &config_path, Some(pos)),
-                    None => {
-                        // GUI menu only opens anchored to a waybar click; the
-                        // SUPER+SHIFT+S keybinding is rofi-only.
-                        0
+            match fixed_x.zip(fixed_y) {
+                Some(pos) => {
+                    if cfg.mode == "gui" {
+                        gui::run(&cfg, &devs, &config_path, Some(pos))
+                    } else {
+                        Menu::new(&cfg).run(&devs).await
                     }
                 }
-            } else {
-                Menu::new(&cfg).run(&devs).await
+                // No anchor position (keybind / CLI launch, e.g.
+                // SUPER+SHIFT+D): GUI mode can only open anchored to a
+                // waybar click, so fall back to the rofi/dmenu menu.
+                None => Menu::new(&cfg).run(&devs).await,
             }
         }
         "devices" => {

@@ -6,7 +6,7 @@ use crate::i18n;
 use crate::udisks::UdisksClient;
 use crate::util;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ActionKind {
     Mount,
     Unmount,
