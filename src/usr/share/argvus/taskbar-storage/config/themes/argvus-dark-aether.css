@@ -1,6 +1,6 @@
 /* Argvus — removable storage module (argvus-taskbar-storage) theme.
  *
- * This file is installed at /etc/argvus/taskbar/storage/theme.css.
+ * This file is installed at /usr/share/argvus/taskbar-storage/config/theme.css.
  * To customize, copy it to ~/.config/argvus/taskbar/storage/theme.css and
  * edit; the user theme overrides the system one. Only used by the
  * GTK popup menu (mode = "gui" in config.json).
@@ -12,13 +12,13 @@
 }
 
 .storage-popup-menu {
-  background-color: #ebebeb;
+  background-color: #181818;
   border: 1px solid @borders;
   padding: 3px 0;
 }
 
 .storage-menu-row {
-  color: #171717;
+  color: @theme_fg_color;
   background-color: transparent;
   background-image: none;
   border: 0;
@@ -30,7 +30,7 @@
 .storage-menu-row.submenu-open,
 .storage-menu-row.pointer-over {
   color: @theme_fg_color;
-  background-color: #171717;
+  background-color: #3590bd;
   background-image: none;
   border: 0;
   box-shadow: none;

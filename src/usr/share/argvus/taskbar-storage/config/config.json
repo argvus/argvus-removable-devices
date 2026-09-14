@@ -1,7 +1,7 @@
 {
   // Argvus — removable storage module (argvus-taskbar-storage) system defaults.
   //
-  // This file is installed at /etc/argvus/taskbar/storage/config.json.
+  // This file is installed at /usr/share/argvus/taskbar-storage/config/config.json.
   // To customize, copy it to ~/.config/argvus/taskbar/storage/config.json
   // and edit; user settings override these defaults. All keys are optional.
   //
@@ -27,7 +27,7 @@
   "unlock_command": "kitty -e",   // prefix used to open a terminal for the LUKS passphrase
   "mode": "gui",                  // gui = GTK context menu on right click | rofi = dmenu-style list
   "menu": "rofi",                 // rofi | wofi | dmenu (only used when mode = rofi)
-  // rofi mode auto-resolves the ARGVUS theme (-config <argvus>/rofi/config.rasi),
+  // rofi mode auto-resolves the ARGVUS theme (-config <argvus>/launcher/config/config.rasi),
   // uses the "-p" value as a base prompt, and navigates devices -> actions with
   // arrows (Right = open submenu, Esc/Left in the submenu = go back).
   "menu_flags": "-dmenu -i -p Storage",

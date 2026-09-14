@@ -282,7 +282,7 @@ fn rofi_config_path() -> Option<String> {
             }
         }
     }
-    let system = PathBuf::from("/usr/share/argvus/rofi/config.rasi");
+    let system = PathBuf::from("/usr/share/argvus/launcher/config/config.rasi");
     if system.is_file() {
         return system.to_str().map(String::from);
     }

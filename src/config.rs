@@ -1,5 +1,7 @@
-const SYSTEM_CONFIG: &str = "/etc/argvus/taskbar/storage/config.json";
-const SYSTEM_THEME: &str = "/etc/argvus/taskbar/storage/theme.css";
+const SYSTEM_CONFIG: &str = "/usr/share/argvus/taskbar-storage/config/config.json";
+const SYSTEM_THEME: &str = "/usr/share/argvus/taskbar-storage/config/theme.css";
+const LEGACY_SYSTEM_CONFIG: &str = "/etc/argvus/taskbar/storage/config.json";
+const LEGACY_SYSTEM_THEME: &str = "/etc/argvus/taskbar/storage/theme.css";
 #[derive(Clone)]
 pub struct Config {
     pub show_name: bool,
@@ -54,7 +56,8 @@ impl Default for Config {
 }
 
 impl Config {
-    // Load config merging (in order): system defaults, user config
+    // Load config merging (in order): system defaults, legacy system config,
+    // user config
     // ($XDG_CONFIG_HOME/argvus/taskbar/storage/config.json), explicit
     // --config path. Missing files are ignored; invalid JSON is skipped with a
     // warning.
@@ -62,6 +65,7 @@ impl Config {
         let mut cfg = Config::default();
         let mut paths: Vec<String> = Vec::new();
         paths.push(SYSTEM_CONFIG.to_string());
+        paths.push(LEGACY_SYSTEM_CONFIG.to_string());
         if let Some(dir) = user_config_dir() {
             paths.push(dir + "/config.json");
         }
@@ -84,6 +88,7 @@ impl Config {
     pub fn theme_css_paths(explicit_config_path: &str) -> Vec<String> {
         let mut paths: Vec<String> = Vec::new();
         paths.push(SYSTEM_THEME.to_string());
+        paths.push(LEGACY_SYSTEM_THEME.to_string());
         if let Some(dir) = user_config_dir() {
             paths.push(dir + "/theme.css");
         }
@@ -199,10 +204,7 @@ fn user_config_dir() -> Option<String> {
     if let Some(xdg) = std::env::var_os("XDG_CONFIG_HOME")
         && !xdg.is_empty()
     {
-        return Some(format!(
-            "{}/argvus/taskbar/storage",
-            xdg.to_string_lossy()
-        ));
+        return Some(format!("{}/argvus/taskbar/storage", xdg.to_string_lossy()));
     }
     if let Some(home) = std::env::var_os("HOME")
         && !home.is_empty()

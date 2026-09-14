@@ -23,15 +23,6 @@ makedepends=(
   'cargo'
   'pkgconf'
 )
-backup=(
-  'etc/argvus/taskbar/storage/config.json'
-  'etc/argvus/taskbar/storage/theme.css'
-  'etc/argvus/taskbar/storage/themes/argvus-dark-silver.css'
-  'etc/argvus/taskbar/storage/themes/argvus-dark-aether.css'
-  'etc/argvus/taskbar/storage/themes/argvus-light-veil.css'
-  'etc/argvus/taskbar/storage/themes/argvus-dark-slate.css'
-  'etc/argvus/taskbar/storage/themes/argvus-dark-universe.css'
-)
 source=(
   "${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz"
 )
@@ -57,16 +48,22 @@ package() {
 
   install -Dm755 "target/release/${pkgname}" \
     "${pkgdir}/usr/bin/${pkgname}"
-  install -Dm755 config/scripts/apps/hypr-storage-menu.sh \
-    "${pkgdir}/usr/share/argvus/scripts/apps/hypr-storage-menu.sh"
+  install -Dm755 src/usr/share/argvus/taskbar-storage/sh/hypr-storage-menu.sh \
+    "${pkgdir}/usr/share/argvus/taskbar-storage/sh/hypr-storage-menu.sh"
 
-  install -Dm644 resources/config.json \
-    "${pkgdir}/etc/argvus/taskbar/storage/config.json"
-  install -Dm644 resources/theme.css \
-    "${pkgdir}/etc/argvus/taskbar/storage/theme.css"
+  install -Dm644 src/usr/share/argvus/taskbar-storage/config/config.json \
+    "${pkgdir}/usr/share/argvus/taskbar-storage/config/config.json"
+  install -Dm644 src/usr/share/argvus/taskbar-storage/config/theme.css \
+    "${pkgdir}/usr/share/argvus/taskbar-storage/config/theme.css"
 
-  install -dm755 "${pkgdir}/etc/argvus/taskbar/storage/themes"
-  install -m644 resources/themes/*.css "${pkgdir}/etc/argvus/taskbar/storage/themes/"
+  install -dm755 "${pkgdir}/usr/share/argvus/taskbar-storage/config/themes"
+  install -m644 src/usr/share/argvus/taskbar-storage/config/themes/*.css \
+    "${pkgdir}/usr/share/argvus/taskbar-storage/config/themes/"
+
+  install -Dm644 src/usr/share/argvus/taskbar-storage/docs/README.md \
+    "${pkgdir}/usr/share/argvus/taskbar-storage/docs/README.md"
+  install -Dm644 src/usr/share/argvus/taskbar-storage/docs/DEVELOPMENT.md \
+    "${pkgdir}/usr/share/argvus/taskbar-storage/docs/DEVELOPMENT.md"
 
   install -Dm644 LICENSE \
     "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
