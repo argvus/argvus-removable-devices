@@ -17,6 +17,7 @@ pub struct Monitor<'a> {
     mount_time: HashMap<String, i64>,
     insertion_seq: HashMap<String, u64>,
     next_insertion: u64,
+    known_devices: Option<HashMap<String, String>>,
 }
 
 impl<'a> Monitor<'a> {
@@ -27,6 +28,7 @@ impl<'a> Monitor<'a> {
             mount_time: HashMap::new(),
             insertion_seq: HashMap::new(),
             next_insertion: 0,
+            known_devices: None,
         }
     }
 
@@ -102,6 +104,45 @@ impl<'a> Monitor<'a> {
             &mut self.insertion_seq,
             &mut self.next_insertion,
         );
+        let current = devices
+            .iter()
+            .map(|device| {
+                let name = if device.name.is_empty() {
+                    device.block.clone()
+                } else {
+                    device.name.clone()
+                };
+                (device.object_path.clone(), name)
+            })
+            .collect::<HashMap<_, _>>();
+
+        if self.config.show_notification
+            && let Some(previous) = &self.known_devices
+        {
+            for name in current
+                .iter()
+                .filter(|(path, _)| !previous.contains_key(*path))
+                .map(|(_, name)| name)
+            {
+                crate::util::notify(
+                    crate::i18n::tr("Device connected", "Dispositivo conectado"),
+                    name,
+                    false,
+                );
+            }
+            for name in previous
+                .iter()
+                .filter(|(path, _)| !current.contains_key(*path))
+                .map(|(_, name)| name)
+            {
+                crate::util::notify(
+                    crate::i18n::tr("Device disconnected", "Dispositivo desconectado"),
+                    name,
+                    false,
+                );
+            }
+        }
+        self.known_devices = Some(current);
         emit(&devices);
     }
 }

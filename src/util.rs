@@ -103,7 +103,7 @@ pub fn statvfs_usage(mountpoint: &str) -> Option<(u64, u64, u64, bool)> {
 
 // Desktop notification via notify-send (best effort).
 pub fn notify(summary: &str, body: &str, critical: bool) {
-    let mut cmd = String::from("notify-send --app-name=argvus-taskbar-storage ");
+    let mut cmd = String::from("notify-send --app-name=argvus-removable-devices ");
     cmd += if critical {
         "-u critical "
     } else {

@@ -1,13 +1,17 @@
-const SYSTEM_CONFIG: &str = "/usr/share/argvus/taskbar-storage/config/config.json";
-const SYSTEM_THEME: &str = "/usr/share/argvus/taskbar-storage/config/theme.css";
-const LEGACY_SYSTEM_CONFIG: &str = "/etc/argvus/taskbar/storage/config.json";
-const LEGACY_SYSTEM_THEME: &str = "/etc/argvus/taskbar/storage/theme.css";
+const SYSTEM_CONFIG: &str = "/etc/argvus/removable-devices/config.json";
+const SYSTEM_THEME: &str = "/usr/share/argvus/removable-devices/config/theme.css";
+const LEGACY_SYSTEM_CONFIG: &str = "/usr/share/argvus/taskbar-storage/config/config.json";
+const LEGACY_SYSTEM_THEME: &str = "/usr/share/argvus/taskbar-storage/config/theme.css";
+const LEGACY_ETC_CONFIG: &str = "/etc/argvus/taskbar/storage/config.json";
+const LEGACY_OLD_ETC_CONFIG: &str = "/etc/argvus-storage/config.json";
+const LEGACY_ETC_THEME: &str = "/etc/argvus/taskbar/storage/theme.css";
 #[derive(Clone)]
 pub struct Config {
     pub show_name: bool,
     pub show_capacity: bool,
     pub hide_when_empty: bool,
     pub show_hidden: bool,
+    pub show_notification: bool,
     pub max_devices: i32,
     pub sort: String,
     pub separator: String,
@@ -34,6 +38,7 @@ impl Default for Config {
             show_capacity: false,
             hide_when_empty: true,
             show_hidden: false,
+            show_notification: true,
             max_devices: 0,
             sort: "mount_time".to_string(),
             separator: "  ".to_string(),
@@ -61,14 +66,20 @@ impl Default for Config {
 impl Config {
     // Load config merging (in order): system defaults, legacy system config,
     // user config
-    // ($XDG_CONFIG_HOME/argvus/taskbar/storage/config.json), explicit
+    // ($XDG_CONFIG_HOME/argvus/removable-devices/config.json), explicit
     // --config path. Missing files are ignored; invalid JSON is skipped with a
     // warning.
     pub fn load(explicit_path: &str) -> Config {
         let mut cfg = Config::default();
-        let mut paths: Vec<String> = Vec::new();
-        paths.push(SYSTEM_CONFIG.to_string());
-        paths.push(LEGACY_SYSTEM_CONFIG.to_string());
+        let mut paths: Vec<String> = vec![
+            LEGACY_SYSTEM_CONFIG.to_string(),
+            LEGACY_ETC_CONFIG.to_string(),
+            LEGACY_OLD_ETC_CONFIG.to_string(),
+            SYSTEM_CONFIG.to_string(),
+        ];
+        for dir in legacy_user_config_dirs() {
+            paths.push(dir + "/config.json");
+        }
         if let Some(dir) = user_config_dir() {
             paths.push(dir + "/config.json");
         }
@@ -98,8 +109,12 @@ impl Config {
     // corresponding config.json.
     pub fn theme_css_paths(explicit_config_path: &str) -> Vec<String> {
         let mut paths: Vec<String> = Vec::new();
-        paths.push(SYSTEM_THEME.to_string());
         paths.push(LEGACY_SYSTEM_THEME.to_string());
+        paths.push(LEGACY_ETC_THEME.to_string());
+        paths.push(SYSTEM_THEME.to_string());
+        for dir in legacy_user_config_dirs() {
+            paths.push(dir + "/theme.css");
+        }
         if let Some(dir) = user_config_dir() {
             paths.push(dir + "/theme.css");
         }
@@ -139,7 +154,7 @@ fn load_json(path: &str) -> Option<serde_json::Value> {
         Ok(v) => Some(v),
         Err(e) => {
             eprintln!(
-                "argvus-taskbar-storage: {} {}: {}",
+                "argvus-removable-devices: {} {}: {}",
                 crate::i18n::tr("ignoring invalid config", "ignorando configuração inválida"),
                 path,
                 e
@@ -175,6 +190,9 @@ fn apply_json(cfg: &mut Config, j: &serde_json::Value) {
     }
     if let Some(v) = get_bool!("show_hidden") {
         cfg.show_hidden = v;
+    }
+    if let Some(v) = get_bool!("show_notification") {
+        cfg.show_notification = v;
     }
     if let Some(v) = obj.get("max_devices").and_then(|v| v.as_i64()) {
         cfg.max_devices = v as i32;
@@ -234,17 +252,36 @@ fn user_config_dir() -> Option<String> {
     if let Some(xdg) = std::env::var_os("XDG_CONFIG_HOME")
         && !xdg.is_empty()
     {
-        return Some(format!("{}/argvus/taskbar/storage", xdg.to_string_lossy()));
+        return Some(format!(
+            "{}/argvus/removable-devices",
+            xdg.to_string_lossy()
+        ));
     }
     if let Some(home) = std::env::var_os("HOME")
         && !home.is_empty()
     {
         return Some(format!(
-            "{}/.config/argvus/taskbar/storage",
+            "{}/.config/argvus/removable-devices",
             home.to_string_lossy()
         ));
     }
     None
+}
+
+fn legacy_user_config_dirs() -> Vec<String> {
+    let base = std::env::var_os("XDG_CONFIG_HOME")
+        .filter(|value| !value.is_empty())
+        .map(|value| value.to_string_lossy().into_owned())
+        .or_else(|| {
+            std::env::var_os("HOME")
+                .filter(|value| !value.is_empty())
+                .map(|value| format!("{}/.config", value.to_string_lossy()))
+        });
+    let Some(base) = base else { return Vec::new() };
+    vec![
+        format!("{base}/argvus/taskbar/storage"),
+        format!("{base}/argvus-removable-devices"),
+    ]
 }
 
 // JSON with // and /* */ comments allowed (the shipped config.json documents
@@ -362,9 +399,11 @@ mod tests {
     #[test]
     fn mode_parsed_from_json() {
         let mut cfg = Config::default();
-        let v: serde_json::Value = serde_json::from_str("{\"mode\": \"gui\"}").unwrap();
+        let v: serde_json::Value =
+            serde_json::from_str("{\"mode\": \"gui\", \"show_notification\": false}").unwrap();
         apply_json(&mut cfg, &v);
         assert_eq!(cfg.mode, "gui");
+        assert!(!cfg.show_notification);
         assert_eq!(Config::default().mode, "rofi");
     }
 }

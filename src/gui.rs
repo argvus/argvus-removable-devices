@@ -71,9 +71,9 @@ pub fn run(
     fixed_pos: Option<(i32, i32)>,
 ) -> i32 {
     if let Err(e) = gtk::init() {
-        eprintln!("argvus-taskbar-storage: gtk init failed: {e}");
+        eprintln!("argvus-removable-devices: gtk init failed: {e}");
         util::notify(
-            "argvus-taskbar-storage",
+            "argvus-removable-devices",
             i18n::tr(
                 "cannot open the storage menu",
                 "não foi possível abrir o menu de armazenamento",
@@ -91,7 +91,7 @@ pub fn run(
 
     let overlay = gtk::Window::new(gtk::WindowType::Toplevel);
     overlay.set_title(i18n::tr("Removable devices", "Dispositivos removíveis"));
-    overlay.set_role("argvus-taskbar-storage");
+    overlay.set_role("argvus-removable-devices");
     overlay.set_widget_name("storage-menu-overlay");
     overlay.set_decorated(false);
     overlay.set_resizable(false);
@@ -103,7 +103,7 @@ pub fn run(
     }
 
     overlay.init_layer_shell();
-    overlay.set_namespace("argvus-taskbar-storage-menu");
+    overlay.set_namespace("argvus-removable-devices-menu");
     overlay.set_layer(Layer::Overlay);
     overlay.set_anchor(Edge::Top, true);
     overlay.set_anchor(Edge::Bottom, true);
@@ -543,7 +543,7 @@ fn install_css(config_path: &str) {
         let provider = gtk::CssProvider::new();
         if let Err(e) = provider.load_from_path(&path) {
             eprintln!(
-                "argvus-taskbar-storage: {} {}: {}",
+                "argvus-removable-devices: {} {}: {}",
                 i18n::tr("ignoring invalid theme", "ignorando tema inválido"),
                 path,
                 e

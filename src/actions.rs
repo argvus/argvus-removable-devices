@@ -236,21 +236,38 @@ impl<'a> Actions<'a> {
         };
         if let Err(e) = result {
             err = e;
-            util::notify("argvus-taskbar-storage", &err, true);
-            eprintln!("argvus-taskbar-storage: {}", err);
+            util::notify("argvus-removable-devices", &err, true);
+            eprintln!("argvus-removable-devices: {}", err);
             return 1;
         }
         0
     }
 }
 
+// Re-enumerate UDisks2 after a mount and return the fresh copy.
+async fn find_fresh(d: &Device, cfg: &Config) -> Option<Device> {
+    let mut client = UdisksClient::new();
+    if !client.connect().await {
+        return None;
+    }
+    let raw = client.enumerate().await;
+    let mut mt = HashMap::new();
+    let mut seq = HashMap::new();
+    let mut next = 0u64;
+    let devs = build_devices(&raw, cfg, &mut mt, &mut seq, &mut next);
+    devs.into_iter().find(|x| x.object_path == d.object_path)
+}
+
 fn is_terminal_file_manager(command: &str) -> bool {
     let mut words = command.split_ascii_whitespace();
-    match (words.next(), words.next()) {
-        (Some("spf" | "superfile" | "yazi"), _) => true,
-        (Some("argvus"), Some("--spf" | "--superfile" | "--yazi" | "--yazy")) => true,
-        _ => false,
-    }
+    matches!(
+        (words.next(), words.next()),
+        (Some("spf" | "superfile" | "yazi"), _)
+            | (
+                Some("argvus"),
+                Some("--spf" | "--superfile" | "--yazi" | "--yazy")
+            )
+    )
 }
 
 #[cfg(test)]
@@ -270,19 +287,4 @@ mod tests {
             assert!(!is_terminal_file_manager(command), "{command}");
         }
     }
-}
-
-// Re-enumerate UDisks2 after a mount and return the fresh copy of `d` so the
-// caller can read its actual mount point.
-async fn find_fresh(d: &Device, cfg: &Config) -> Option<Device> {
-    let mut client = UdisksClient::new();
-    if !client.connect().await {
-        return None;
-    }
-    let raw = client.enumerate().await;
-    let mut mt = HashMap::new();
-    let mut seq = HashMap::new();
-    let mut next = 0u64;
-    let devs = build_devices(&raw, cfg, &mut mt, &mut seq, &mut next);
-    devs.into_iter().find(|x| x.object_path == d.object_path)
 }

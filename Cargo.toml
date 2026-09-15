@@ -1,11 +1,11 @@
 [package]
-name = "argvus-taskbar-storage"
+name = "argvus-removable-devices"
 version = "0.1.3"
 edition = "2024"
 description = "Removable storage module for waybar (UDisks2)"
 
 [[bin]]
-name = "argvus-taskbar-storage"
+name = "argvus-removable-devices"
 path = "src/main.rs"
 
 [dependencies]

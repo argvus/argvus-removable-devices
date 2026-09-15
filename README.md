@@ -1,11 +1,11 @@
-# Argvus Storage
+# Argvus Removable Devices
 
-Argvus Storage is the official removable-storage application for Argvus. It is written in Rust, watches UDisks2 events and feeds the Argvus Waybar storage module.
+Argvus Removable Devices is the official removable-device application for Argvus. It is written in Rust, watches UDisks2 events and feeds the Argvus Waybar storage module.
 
 It also owns the Hyprland/menu compatibility launcher:
 
 ```text
-/usr/share/argvus/taskbar-storage/sh/hypr-storage-menu.sh
+/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh
 ```
 
 ## Documentation

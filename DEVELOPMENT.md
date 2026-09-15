@@ -1,6 +1,6 @@
 # Development
 
-Argvus Storage is a Rust application used by the Argvus Waybar module. It talks to UDisks2 over D-Bus and can present either a Waybar JSON stream or an interactive device menu.
+Argvus Removable Devices is a Rust application used by the Argvus Waybar module. It talks to UDisks2 over D-Bus and can present either a Waybar JSON stream or an interactive device menu.
 
 ## Requirements
 
@@ -31,28 +31,28 @@ cargo run --locked -- menu
 
 ## Configuration files
 
-Source defaults live in this repository under `src/usr/share/argvus/taskbar-storage/config/`:
+The shipped theme resources live in this repository under `src/usr/share/argvus/removable-devices/config/`:
 
 ```text
-src/usr/share/argvus/taskbar-storage/config/config.json
-src/usr/share/argvus/taskbar-storage/config/theme.css
-src/usr/share/argvus/taskbar-storage/config/themes/
+src/etc/argvus/removable-devices/config.json
+src/usr/share/argvus/removable-devices/config/theme.css
+src/usr/share/argvus/removable-devices/config/themes/
 ```
 
 The Arch package installs them to:
 
 ```text
-/usr/share/argvus/taskbar-storage/config/config.json
-/usr/share/argvus/taskbar-storage/config/theme.css
-/usr/share/argvus/taskbar-storage/config/themes/
+/etc/argvus/removable-devices/config.json
+/usr/share/argvus/removable-devices/config/theme.css
+/usr/share/argvus/removable-devices/config/themes/
 ```
 
 User overrides are read from:
 
 ```text
-~/.config/argvus/taskbar/storage/config.json
-~/.config/argvus/taskbar/storage/theme.css
-~/.config/argvus/taskbar/storage/themes/
+~/.config/argvus/removable-devices/config.json
+~/.config/argvus/removable-devices/theme.css
+~/.config/argvus/removable-devices/themes/
 ```
 
 ## Release flow
@@ -61,7 +61,7 @@ User overrides are read from:
 2. Run tests and clippy.
 3. Commit the version change.
 4. Tag `vX.Y.Z` and push the tag.
-5. Confirm the package workflow builds `argvus-storage-X.Y.Z-1-x86_64.pkg.tar.zst`.
+5. Confirm the package workflow builds `argvus-removable-devices-X.Y.Z-1-x86_64.pkg.tar.zst`.
 6. Confirm the workflow publishes the package to `argvus/packages` under `public/arch/x86_64/` and updates the Arch repository database.
 
 The project does not create GitHub Releases for package distribution. The built

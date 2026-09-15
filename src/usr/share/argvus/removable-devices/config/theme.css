@@ -1,7 +1,7 @@
-/* Argvus — removable storage module (argvus-taskbar-storage) theme.
+/* Argvus — removable storage module (argvus-removable-devices) theme.
  *
- * This file is installed at /usr/share/argvus/taskbar-storage/config/theme.css.
- * To customize, copy it to ~/.config/argvus/taskbar/storage/theme.css and
+ * This file is installed at /usr/share/argvus/removable-devices/config/theme.css.
+ * To customize, copy it to ~/.config/argvus/removable-devices/theme.css and
  * edit; the user theme overrides the system one. Only used by the
  * GTK popup menu (mode = "gui" in config.json).
  */

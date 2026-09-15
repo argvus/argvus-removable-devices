@@ -1,12 +1,14 @@
 # Maintainer: William C. Canin
-pkgname=argvus-taskbar-storage
+pkgname=argvus-removable-devices
 pkgver=0.2.0
 pkgrel=1
 pkgdesc="Removable storage module for Waybar, written in Rust for the Argvus desktop"
 arch=('x86_64')
-url="https://github.com/argvus/argvus-taskbar-storage"
+url="https://github.com/argvus/argvus-removable-devices"
 license=('GPL-3.0-only')
 options=('!debug')
+replaces=('argvus-taskbar-storage' 'argvus-storage')
+provides=('argvus-taskbar-storage' 'argvus-storage')
 depends=(
   'gtk3'
   'gtk-layer-shell'
@@ -50,22 +52,22 @@ package() {
 
   install -Dm755 "target/release/${pkgname}" \
     "${pkgdir}/usr/bin/${pkgname}"
-  install -Dm755 src/usr/share/argvus/taskbar-storage/sh/hypr-storage-menu.sh \
-    "${pkgdir}/usr/share/argvus/taskbar-storage/sh/hypr-storage-menu.sh"
+  install -Dm755 src/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh \
+    "${pkgdir}/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh"
 
-  install -Dm644 src/usr/share/argvus/taskbar-storage/config/config.json \
-    "${pkgdir}/usr/share/argvus/taskbar-storage/config/config.json"
-  install -Dm644 src/usr/share/argvus/taskbar-storage/config/theme.css \
-    "${pkgdir}/usr/share/argvus/taskbar-storage/config/theme.css"
+  install -Dm644 src/etc/argvus/removable-devices/config.json \
+    "${pkgdir}/etc/argvus/removable-devices/config.json"
+  install -Dm644 src/usr/share/argvus/removable-devices/config/theme.css \
+    "${pkgdir}/usr/share/argvus/removable-devices/config/theme.css"
 
-  install -dm755 "${pkgdir}/usr/share/argvus/taskbar-storage/config/themes"
-  install -m644 src/usr/share/argvus/taskbar-storage/config/themes/*.css \
-    "${pkgdir}/usr/share/argvus/taskbar-storage/config/themes/"
+  install -dm755 "${pkgdir}/usr/share/argvus/removable-devices/config/themes"
+  install -m644 src/usr/share/argvus/removable-devices/config/themes/*.css \
+    "${pkgdir}/usr/share/argvus/removable-devices/config/themes/"
 
-  install -Dm644 src/usr/share/argvus/taskbar-storage/docs/README.md \
-    "${pkgdir}/usr/share/argvus/taskbar-storage/docs/README.md"
-  install -Dm644 src/usr/share/argvus/taskbar-storage/docs/DEVELOPMENT.md \
-    "${pkgdir}/usr/share/argvus/taskbar-storage/docs/DEVELOPMENT.md"
+  install -Dm644 src/usr/share/argvus/removable-devices/docs/README.md \
+    "${pkgdir}/usr/share/argvus/removable-devices/docs/README.md"
+  install -Dm644 src/usr/share/argvus/removable-devices/docs/DEVELOPMENT.md \
+    "${pkgdir}/usr/share/argvus/removable-devices/docs/DEVELOPMENT.md"
 
   install -Dm644 LICENSE \
     "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"

@@ -30,7 +30,7 @@ impl<'a> Menu<'a> {
             .collect();
         if valid.is_empty() {
             util::notify(
-                "argvus-taskbar-storage",
+                "argvus-removable-devices",
                 i18n::tr(
                     "No removable storage devices",
                     "Nenhum dispositivo de armazenamento removível",
@@ -47,7 +47,7 @@ impl<'a> Menu<'a> {
                 .iter()
                 .map(|&i| submenu_device_label(&devices[i]))
                 .collect();
-            let cmd = self.menu_cmd(&devices_prompt);
+            let cmd = self.menu_cmd(devices_prompt);
             let Some((output, _error)) = util::run_capture(&cmd, &rows) else {
                 // Cancelled at the device list (dmenu returns non-zero).
                 return 1;
@@ -84,7 +84,7 @@ impl<'a> Menu<'a> {
     pub async fn run_devices(&self, devices: &[Device]) -> i32 {
         if devices.is_empty() {
             util::notify(
-                "argvus-taskbar-storage",
+                "argvus-removable-devices",
                 i18n::tr(
                     "No removable storage devices",
                     "Nenhum dispositivo de armazenamento removível",
@@ -96,7 +96,7 @@ impl<'a> Menu<'a> {
 
         let entries: Vec<String> = devices.iter().map(device_label).collect();
         let prompt = i18n::tr("Removable devices", "Dispositivos removíveis");
-        let cmd = self.menu_cmd(&prompt);
+        let cmd = self.menu_cmd(prompt);
         let Some((output, _error)) = util::run_capture(&cmd, &entries) else {
             return 1;
         };
