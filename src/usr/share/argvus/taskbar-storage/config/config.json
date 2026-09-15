@@ -21,8 +21,11 @@
   "separator": "  ",
   "format": "{icon}",
 
-  "open_command": "xdg-open",          // compatibility alias for file_manager_command
-  "file_manager_command": "xdg-open",  // examples: "nautilus", "kitty -e yazi", "kitty -e spf"
+  // Leave these unset to use the File Manager selected in ARGVUS Control
+  // Center (`get-default.sh file_manager`). Set file_manager_command only
+  // when an explicit storage-specific override is required.
+  // "open_command": "...",             // compatibility alias
+  // "file_manager_command": "...",     // e.g. "nautilus", "spf" or "yazi"
   "copy_command": "wl-copy",
   "unlock_command": "kitty -e",   // prefix used to open a terminal for the LUKS passphrase
   "mode": "gui",                  // gui = GTK context menu on right click | rofi = dmenu-style list

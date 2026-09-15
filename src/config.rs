@@ -40,8 +40,11 @@ impl Default for Config {
             format: "{icon}".to_string(),
             tooltip_format:
                 "{name}\n{state}\n{fs} · {capacity}\n{used} used · {free} free\n{mount}".to_string(),
-            open_command: "xdg-open".to_string(),
-            file_manager_command: "xdg-open".to_string(),
+            // An empty command means "use the ARGVUS default-apps service".
+            // This keeps the storage menu synchronized with the File Manager
+            // selected in argvus-control-center.
+            open_command: String::new(),
+            file_manager_command: String::new(),
             copy_command: "wl-copy".to_string(),
             unlock_command: "kitty -e".to_string(),
             mode: "rofi".to_string(),
@@ -77,6 +80,14 @@ impl Config {
                 apply_json(&mut cfg, &json);
             }
         }
+        // `xdg-open` was the old shipped default. Treat it like an unset
+        // value so existing user/system copies migrate to the ARGVUS default
+        // instead of continuing to bypass argvus-control-center.
+        if cfg.file_manager_command.trim().is_empty()
+            || cfg.file_manager_command.trim() == "xdg-open"
+        {
+            cfg.file_manager_command = configured_file_manager();
+        }
         cfg
     }
 
@@ -101,6 +112,25 @@ impl Config {
         }
         paths
     }
+}
+
+fn configured_file_manager() -> String {
+    let system_config = std::env::var_os("ARGVUS_SYSTEM_CONFIG")
+        .filter(|value| !value.is_empty())
+        .map(|value| value.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "/usr/share/argvus".to_string());
+    let script = format!("{system_config}/session/sh/get-default.sh");
+
+    let output = std::process::Command::new("sh")
+        .arg(&script)
+        .arg("file_manager")
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_string())
+        .filter(|value| !value.is_empty());
+
+    output.unwrap_or_else(|| "argvus --spf".to_string())
 }
 
 fn load_json(path: &str) -> Option<serde_json::Value> {
@@ -325,7 +355,7 @@ mod tests {
         let cfg = Config::default();
         assert_eq!(cfg.sort, "mount_time");
         assert_eq!(cfg.format, "{icon}");
-        assert_eq!(cfg.file_manager_command, "xdg-open");
+        assert!(cfg.file_manager_command.is_empty());
         assert_eq!(cfg.icons_mounted, "\u{f02ca}");
     }
 

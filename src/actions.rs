@@ -130,11 +130,16 @@ impl<'a> Actions<'a> {
 
     async fn open(&self, d: &Device) -> Result<(), String> {
         let target = self.resolve_mount(d).await?;
-        let cmd = format!(
-            "{} {}",
-            self.config.file_manager_command,
-            util::shell_quote(&target)
-        );
+        let manager = self.config.file_manager_command.trim();
+        let command = if is_terminal_file_manager(manager) {
+            // TUI file managers need a real terminal. Keep the configured
+            // command intact so both `spf`/`yazi` and ARGVUS wrappers such as
+            // `argvus --spf`/`argvus --yazi` work with the selected directory.
+            format!("foot {}", manager)
+        } else {
+            manager.to_string()
+        };
+        let cmd = format!("{} {}", command, util::shell_quote(&target));
         if util::fork_exec(&cmd) < 0 {
             return Err(i18n::tr(
                 "failed to launch the file manager",
@@ -236,6 +241,34 @@ impl<'a> Actions<'a> {
             return 1;
         }
         0
+    }
+}
+
+fn is_terminal_file_manager(command: &str) -> bool {
+    let mut words = command.split_ascii_whitespace();
+    match (words.next(), words.next()) {
+        (Some("spf" | "superfile" | "yazi"), _) => true,
+        (Some("argvus"), Some("--spf" | "--superfile" | "--yazi" | "--yazy")) => true,
+        _ => false,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_terminal_file_manager;
+
+    #[test]
+    fn identifies_terminal_file_managers() {
+        for command in ["spf", "superfile", "yazi", "argvus --spf", "argvus --yazy"] {
+            assert!(is_terminal_file_manager(command), "{command}");
+        }
+    }
+
+    #[test]
+    fn leaves_graphical_file_managers_without_terminal() {
+        for command in ["nautilus", "thunar", "dolphin", "xdg-open"] {
+            assert!(!is_terminal_file_manager(command), "{command}");
+        }
     }
 }
 
