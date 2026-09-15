@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use zbus::Connection;
+use zbus::message::Type;
+use zbus::{Connection, MatchRule};
 use zvariant::OwnedValue;
 use zvariant::Value;
 
@@ -438,10 +439,6 @@ fn parse_drive(props: &HashMap<String, OwnedValue>, d: &mut RawDrive) {
 // True when the message is a UDisks2 change signal we care about.
 pub fn is_relevant_signal(msg: &zbus::Message) -> bool {
     let header = msg.header();
-    let sender = header.sender().map(|s| s.to_string()).unwrap_or_default();
-    if sender != SERVICE {
-        return false;
-    }
     let iface = header
         .interface()
         .map(|s| s.to_string())
@@ -453,4 +450,17 @@ pub fn is_relevant_signal(msg: &zbus::Message) -> bool {
             | ("org.freedesktop.DBus.ObjectManager", "InterfacesAdded")
             | ("org.freedesktop.DBus.ObjectManager", "InterfacesRemoved")
     )
+}
+
+// Signal headers contain UDisks2's unique bus name (for example, :1.42), not
+// its well-known name. Match the well-known name at the bus level instead of
+// comparing it directly with the sender header.
+pub fn signal_match_rule() -> Result<MatchRule<'static>, zbus::Error> {
+    MatchRule::builder()
+        .msg_type(Type::Signal)
+        .sender(SERVICE)?
+        .path_namespace(MANAGER_PATH)?
+        .build()
+        .try_into()
+        .map_err(Into::into)
 }

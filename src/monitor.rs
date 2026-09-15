@@ -7,7 +7,7 @@ use futures_lite::stream::StreamExt;
 
 use crate::config::Config;
 use crate::device::{Device, build_devices};
-use crate::udisks::{UdisksClient, is_relevant_signal};
+use crate::udisks::{UdisksClient, is_relevant_signal, signal_match_rule};
 
 const DEBOUNCE_MS: u64 = 150;
 
@@ -52,7 +52,10 @@ impl<'a> Monitor<'a> {
             .client
             .connection()
             .ok_or_else(|| "system bus connection lost".to_string())?;
-        let mut stream = MessageStream::from(&connection);
+        let rule = signal_match_rule().map_err(|e| e.to_string())?;
+        let mut stream = MessageStream::for_match_rule(rule, &connection, Some(32))
+            .await
+            .map_err(|e| e.to_string())?;
 
         use tokio::signal::unix::{SignalKind, signal};
         let mut sigint = signal(SignalKind::interrupt()).map_err(|e| e.to_string())?;
