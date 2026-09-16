@@ -48,27 +48,23 @@ jobs:
             fi
           fi
 
-          sed -i "s/^pkgver=.*/pkgver=${version}/" "packaging/arch/PKGBUILD"
+          sed -i "s/^pkgver=.*/pkgver=${version}/" "packaging/arch/ci/PKGBUILD"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
 
       - name: Validate repository
         shell: bash
         run: |
           set -euo pipefail
-          if make -n validate >/dev/null 2>&1; then
-            make validate
-          else
-            echo "No make validate target; skipping repository validation."
-          fi
+          make validate
 
       - name: Build package
         shell: bash
         run: |
           set -euo pipefail
 
-          sudo -u builder env GITHUB_WORKSPACE="$GITHUB_WORKSPACE" bash -lc             'cd "$GITHUB_WORKSPACE/packaging/arch" && makepkg --nodeps --noconfirm --needed --cleanbuild --clean'
+          sudo -u builder env GITHUB_WORKSPACE="$GITHUB_WORKSPACE" bash -lc 'cd "$GITHUB_WORKSPACE/packaging/arch/ci" && makepkg --nodeps --noconfirm --needed --cleanbuild --clean --check'
 
-          pkg_file="$(find "packaging/arch" -maxdepth 1 -type f -name 'argvus-taskbar-storage-*.pkg.tar.zst' -print -quit)"
+          pkg_file="$(find "packaging/arch/ci" -maxdepth 1 -type f -name 'argvus-removable-devices-*.pkg.tar.zst' -print -quit)"
           if [[ -z "$pkg_file" ]]; then
             echo "Package file was not created." >&2
             exit 1

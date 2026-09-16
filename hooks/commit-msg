@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+message_file="$1"
+grep -Eq '^(feat|fix|docs|refactor|test|ci|build|perf|chore)(\([^)]+\))?!?: .+' "$message_file"

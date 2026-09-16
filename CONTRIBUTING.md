@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for contributing to Argvus Storage.
+Thank you for contributing to argvus-removable-devices.
 
 ## Guidelines
 

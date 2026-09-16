@@ -1,0 +1,47 @@
+# Maintainer: William C. Canin
+pkgname=argvus-removable-devices
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="Removable storage module for Waybar using UDisks2"
+arch=('x86_64')
+url="https://github.com/argvus/argvus-removable-devices"
+license=('GPL-3.0-only')
+depends=('gcc-libs' 'glibc' 'gtk3' 'gtk-layer-shell' 'hyprland' 'libnotify' 'argvus-session' 'foot' 'udisks2' 'wl-clipboard' 'xdg-utils')
+optdepends=('argvus-launcher: Rofi dmenu-style fallback menu mode')
+makedepends=('cargo' 'pkgconf')
+options=('!debug')
+replaces=('argvus-taskbar-storage' 'argvus-storage')
+provides=('argvus-taskbar-storage' 'argvus-storage')
+source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+_source_dir() {
+  find "${srcdir}" -mindepth 1 -maxdepth 1 -type d -print -quit
+}
+
+build() {
+  cd "$(_source_dir)"
+  cargo build --workspace --release --locked
+}
+
+check() {
+  cd "$(_source_dir)"
+  cargo test --workspace --release --locked
+}
+
+package() {
+  cd "$(_source_dir)"
+
+  install -Dm755 "target/release/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  install -Dm755 resources/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh \
+    "${pkgdir}/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh"
+  install -Dm644 resources/etc/argvus/removable-devices/config.json \
+    "${pkgdir}/etc/argvus/removable-devices/config.json"
+  install -Dm644 resources/usr/share/argvus/removable-devices/config/theme.css \
+    "${pkgdir}/usr/share/argvus/removable-devices/config/theme.css"
+  install -dm755 "${pkgdir}/usr/share/argvus/removable-devices/config/themes"
+  install -m644 resources/usr/share/argvus/removable-devices/config/themes/*.css \
+    "${pkgdir}/usr/share/argvus/removable-devices/config/themes/"
+  install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

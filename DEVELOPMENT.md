@@ -11,7 +11,18 @@ cargo --version
 pkg-config --version
 ```
 
-On Arch Linux, the runtime/build dependencies are represented by `packaging/PKGBUILD`.
+On Arch Linux, the runtime/build dependencies are represented by `packaging/arch/ci/PKGBUILD`.
+
+The repository follows the ARGVUS Rust and Arch packaging layout:
+
+```text
+crates/main/        Rust application workspace member
+packaging/arch/ci/  tagged-source PKGBUILD
+packaging/arch/local/ working-tree PKGBUILD
+resources/          installed configuration, themes and scripts
+tools/sh/            local package driver
+build/               ignored package artifacts and distributions
+```
 
 ## Commands
 
@@ -31,12 +42,12 @@ cargo run --locked -- menu
 
 ## Configuration files
 
-The shipped theme resources live in this repository under `src/usr/share/argvus/removable-devices/config/`:
+The shipped theme resources live in this repository under `resources/usr/share/argvus/removable-devices/config/`:
 
 ```text
-src/etc/argvus/removable-devices/config.json
-src/usr/share/argvus/removable-devices/config/theme.css
-src/usr/share/argvus/removable-devices/config/themes/
+resources/etc/argvus/removable-devices/config.json
+resources/usr/share/argvus/removable-devices/config/theme.css
+resources/usr/share/argvus/removable-devices/config/themes/
 ```
 
 The Arch package installs them to:

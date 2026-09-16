@@ -1,4 +1,4 @@
-name: CI
+name: Package Compilation
 
 on:
   push:
@@ -23,27 +23,66 @@ jobs:
 
       - name: Install validation tools
         run: |
-          pacman -Syu --noconfirm --needed             base-devel             git             shellcheck             sudo
+          pacman -Syu --noconfirm --needed base-devel cargo git namcap pacman-contrib shellcheck sudo
+
+      - name: Prepare unprivileged build user
+        run: |
+          useradd --create-home --shell /bin/bash builder
+          printf 'builder ALL=(ALL) NOPASSWD: ALL\n' >/etc/sudoers.d/builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
 
       - name: Validate repository
         shell: bash
         run: |
           set -euo pipefail
-          if make -n validate >/dev/null 2>&1; then
-            make validate
-          else
-            echo "No make validate target; skipping repository validation."
+          sudo -u builder make check
+          sudo -u builder make validate
+
+      - name: Build local package
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u builder make package
+
+      - name: Lint CI PKGBUILD with namcap
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(namcap packaging/arch/ci/PKGBUILD 2>&1)" || status=$?
+          status="${status:-0}"
+          printf '%s\n' "$output"
+          unexpected="$(printf '%s\n' "$output" | grep -v 'E: Missing checksums' || true)"
+          if [[ "$status" -ne 0 && "$unexpected" == *' E: '* ]]; then
+            exit "$status"
           fi
 
-      - name: Validate CI PKGBUILD
+      - name: Lint local PKGBUILD with namcap
         shell: bash
         run: |
           set -euo pipefail
-          cd "packaging/arch"
-          makepkg -p PKGBUILD --printsrcinfo >/dev/null
+          output="$(namcap packaging/arch/local/PKGBUILD 2>&1)" || status=$?
+          status="${status:-0}"
+          printf '%s\n' "$output"
+          unexpected="$(printf '%s\n' "$output" | grep -v 'E: Missing checksums' || true)"
+          if [[ "$status" -ne 0 && "$unexpected" == *' E: '* ]]; then
+            exit "$status"
+          fi
 
-      - name: Validate local PKGBUILD
+      - name: Lint built package with namcap
         shell: bash
         run: |
           set -euo pipefail
-          test -f "packaging/arch/PKGBUILD.local"
+          namcap build/dist/*.pkg.tar.zst
+
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Run cspell
+        uses: streetsidesoftware/cspell-action@v6
+        with:
+          config: cspell.json

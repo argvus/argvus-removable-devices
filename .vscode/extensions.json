@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "rust-lang.rust-analyzer",
+    "vadimcn.vscode-lldb",
+    "tamasfe.even-better-toml",
+    "ms-vscode.makefile-tools",
+    "redhat.vscode-yaml",
+    "editorconfig.editorconfig"
+  ]
+}
