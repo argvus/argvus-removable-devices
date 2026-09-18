@@ -19,6 +19,10 @@ _source_dir() {
   find "${srcdir}" -mindepth 1 -maxdepth 1 -type d -print -quit
 }
 
+_cargo_target_dir() {
+  printf '%s' "${CARGO_TARGET_DIR:-$(_source_dir)/target}"
+}
+
 build() {
   cd "$(_source_dir)"
   cargo build --workspace --release --locked
@@ -32,7 +36,7 @@ check() {
 package() {
   cd "$(_source_dir)"
 
-  install -Dm755 "target/release/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  install -Dm755 "$(_cargo_target_dir)/release/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
   install -Dm755 resources/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh \
     "${pkgdir}/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh"
   install -Dm644 resources/etc/argvus/removable-devices/config.json \
