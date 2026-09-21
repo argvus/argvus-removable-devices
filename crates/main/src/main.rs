@@ -50,6 +50,7 @@ fn print_usage(out: &mut dyn Write) {
              \x20 --config <path>  use an explicit config file\n\
              \x20 --x <px>        pin the menu X to a position (gui mode)\n\
              \x20 --y <px>        pin the menu Y to a position (gui mode)\n\
+             \x20 --bar-bottom <px>  bottom edge of the Waybar surface (gui mode)\n\
              \x20 -h, --help       show this help\n\
              \x20 -v, --version    print the version",
             "argvus-removable-devices {VERSION} - módulo de armazenamento removível para waybar (UDisks2)\n\
@@ -78,6 +79,7 @@ fn print_usage(out: &mut dyn Write) {
              \x20 --config <caminho>  usa um arquivo de configuração explícito\n\
              \x20 --x <px>        fixa o X do menu em uma posição (modo gui)\n\
              \x20 --y <px>        fixa o Y do menu em uma posição (modo gui)\n\
+             \x20 --bar-bottom <px>  borda inferior da Waybar (modo gui)\n\
              \x20 -h, --help       mostra esta ajuda\n\
              \x20 -v, --version    imprime a versão"
         )
@@ -197,6 +199,7 @@ async fn main() {
   let mut positional: Vec<String> = Vec::new();
   let mut fixed_x: Option<i32> = None;
   let mut fixed_y: Option<i32> = None;
+  let mut bar_bottom: Option<i32> = None;
   let mut i = 0;
   while i < args.len() {
     let arg = &args[i];
@@ -230,6 +233,19 @@ async fn main() {
         std::process::exit(2);
       }
       fixed_y = args[i].parse().ok();
+    } else if arg == "--bar-bottom" {
+      i += 1;
+      if i >= args.len() {
+        eprintln!(
+          "argvus-removable-devices: {}",
+          i18n::tr(
+            "--bar-bottom requires a value",
+            "--bar-bottom exige um valor"
+          )
+        );
+        std::process::exit(2);
+      }
+      bar_bottom = args[i].parse().ok();
     } else if arg == "-h" || arg == "--help" {
       print_usage(&mut std::io::stdout());
       return;
@@ -259,7 +275,7 @@ async fn main() {
       match fixed_x.zip(fixed_y) {
         Some(pos) => {
           if cfg.mode == "gui" {
-            gui::run(&cfg, &devs, &config_path, Some(pos))
+            gui::run(&cfg, &devs, &config_path, Some(pos), bar_bottom)
           } else {
             Menu::new(&cfg).run(&devs).await
           }

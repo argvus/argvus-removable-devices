@@ -69,6 +69,7 @@ pub fn run(
   devices: &[Device],
   config_path: &str,
   fixed_pos: Option<(i32, i32)>,
+  bar_bottom: Option<i32>,
 ) -> i32 {
   if let Err(e) = gtk::init() {
     eprintln!("argvus-removable-devices: gtk init failed: {e}");
@@ -87,7 +88,7 @@ pub fn run(
 
   let handle = tokio::runtime::Handle::current();
   let (update_tx, update_rx) = mpsc::channel::<UiUpdate>();
-  let position = popup_position(devices.len(), fixed_pos);
+  let position = popup_position(devices.len(), fixed_pos, bar_bottom);
 
   let overlay = gtk::Window::new(gtk::WindowType::Toplevel);
   overlay.set_title(i18n::tr("Removable devices", "Dispositivos removíveis"));
@@ -475,7 +476,11 @@ fn connect_action(item: &gtk::EventBox, entry: DeviceEntry, ctx: &MenuCtx) {
   });
 }
 
-fn popup_position(device_count: usize, fixed_pos: Option<(i32, i32)>) -> PopupPosition {
+fn popup_position(
+  device_count: usize,
+  fixed_pos: Option<(i32, i32)>,
+  bar_bottom: Option<i32>,
+) -> PopupPosition {
   let (pointer_x, pointer_y) =
     fixed_pos.unwrap_or_else(|| current_pointer_position().unwrap_or((0, 0)));
   let display = gdk::DisplayManager::get().default_display();
@@ -496,19 +501,51 @@ fn popup_position(device_count: usize, fixed_pos: Option<(i32, i32)>) -> PopupPo
 
   let geometry = monitor_ref.geometry();
   let local_x = pointer_x - geometry.x();
-  let local_y = pointer_y - geometry.y();
   let estimated_height = ((device_count as i32 + 3) * 32).max(128);
   let max_x = (geometry.width() - MENU_WIDTH - SCREEN_MARGIN).max(SCREEN_MARGIN);
   let max_y = (geometry.height() - estimated_height - SCREEN_MARGIN).max(SCREEN_MARGIN);
+  let bar_bottom = bar_bottom
+    .or_else(|| current_waybar_bottom(pointer_x, pointer_y))
+    .unwrap_or(pointer_y);
+  let popup_y = bar_bottom - geometry.y() + MENU_GAP_Y;
 
   PopupPosition {
     monitor,
     x: local_x.clamp(SCREEN_MARGIN, max_x),
-    y: (local_y + MENU_GAP_Y).clamp(SCREEN_MARGIN, max_y),
+    y: popup_y.clamp(SCREEN_MARGIN, max_y),
     width: geometry.width(),
     origin_x: geometry.x(),
     origin_y: geometry.y(),
   }
+}
+
+fn current_waybar_bottom(pointer_x: i32, pointer_y: i32) -> Option<i32> {
+  let output = std::process::Command::new("hyprctl")
+    .args(["layers", "-j"])
+    .output()
+    .ok()?;
+  if !output.status.success() {
+    return None;
+  }
+  let outputs = serde_json::from_slice::<serde_json::Value>(&output.stdout).ok()?;
+  outputs.as_object()?.values().find_map(|output| {
+    output
+      .get("levels")?
+      .as_object()?
+      .values()
+      .flat_map(serde_json::Value::as_array)
+      .flatten()
+      .find_map(|layer| {
+        let namespace = layer.get("namespace")?.as_str()?;
+        let x = layer.get("x")?.as_i64()? as i32;
+        let y = layer.get("y")?.as_i64()? as i32;
+        let w = layer.get("w")?.as_i64()? as i32;
+        let h = layer.get("h")?.as_i64()? as i32;
+        let horizontal = namespace == "waybar" && w > h.saturating_mul(4);
+        let contains = pointer_x >= x && pointer_x < x + w && pointer_y >= y && pointer_y < y + h;
+        (horizontal && contains).then_some(y + h)
+      })
+  })
 }
 
 fn current_pointer_position() -> Option<(i32, i32)> {
@@ -556,6 +593,61 @@ fn install_css(config_path: &str) {
       gtk::STYLE_PROVIDER_PRIORITY_USER,
     );
   }
+  let accent = accent_runtime_css();
+  if !accent.is_empty() {
+    let provider = gtk::CssProvider::new();
+    let _ = provider.load_from_data(accent.as_bytes());
+    gtk::StyleContext::add_provider_for_screen(
+      &screen,
+      &provider,
+      gtk::STYLE_PROVIDER_PRIORITY_USER + 1,
+    );
+  }
+}
+
+fn accent_runtime_css() -> String {
+  let Some(config_home) = std::env::var_os("ARGVUS_CONFIG_HOME")
+    .or_else(|| std::env::var_os("XDG_CONFIG_HOME"))
+    .or_else(|| {
+      std::env::var_os("HOME").map(|home| {
+        let mut path = std::path::PathBuf::from(home);
+        path.push(".config");
+        path.into_os_string()
+      })
+    })
+  else {
+    return String::new();
+  };
+  let path = std::path::PathBuf::from(config_home)
+    .join("argvus")
+    .join(".accent-color");
+  let Ok(value) = std::fs::read_to_string(path) else {
+    return String::new();
+  };
+  let value = value.trim();
+  let hex = value.strip_prefix('#').unwrap_or(value);
+  if hex.len() != 6 || !hex.chars().all(|ch| ch.is_ascii_hexdigit()) {
+    return String::new();
+  }
+  let Ok(red) = u8::from_str_radix(&hex[0..2], 16) else {
+    return String::new();
+  };
+  let Ok(green) = u8::from_str_radix(&hex[2..4], 16) else {
+    return String::new();
+  };
+  let Ok(blue) = u8::from_str_radix(&hex[4..6], 16) else {
+    return String::new();
+  };
+  let luminance = (299 * u32::from(red) + 587 * u32::from(green) + 114 * u32::from(blue)) / 1000;
+  let text = if luminance >= 128 {
+    "#000000"
+  } else {
+    "#FFFFFF"
+  };
+  format!(
+    ".storage-popup-menu {{ border-color: rgba({red}, {green}, {blue}, 0.54); }}\n\
+     .storage-menu-row:hover, .storage-menu-row.submenu-open, .storage-menu-row.pointer-over {{ background-color: {value}; color: {text}; }}"
+  )
 }
 
 // Mirror the action set offered by the rofi mode, filtered by device state.
