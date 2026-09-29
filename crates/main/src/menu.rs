@@ -272,7 +272,7 @@ fn rofi_config_path() -> Option<String> {
   let relative = [
     "rofi/config.rasi",
     "argvus/rofi/config.rasi",
-    "argvus/generated/rofi/config.rasi",
+    "argvus/data/generated/rofi/config.rasi",
   ];
   for dir in dirs {
     for rel in relative {
