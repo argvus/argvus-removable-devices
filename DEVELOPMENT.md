@@ -61,9 +61,9 @@ The Arch package installs them to:
 User overrides are read from:
 
 ```text
-~/.config/argvus/removable-devices/config.json
-~/.config/argvus/removable-devices/theme.css
-~/.config/argvus/removable-devices/themes/
+~/.config/argvus/data/removable-devices/config.json
+~/.config/argvus/data/removable-devices/theme.css
+~/.config/argvus/data/removable-devices/themes/
 ```
 
 ## Release flow

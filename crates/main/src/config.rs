@@ -66,7 +66,7 @@ impl Default for Config {
 impl Config {
   // Load config merging (in order): system defaults, legacy system config,
   // user config
-  // ($XDG_CONFIG_HOME/argvus/removable-devices/config.json), explicit
+  // ($XDG_CONFIG_HOME/argvus/data/removable-devices/config.json), explicit
   // --config path. Missing files are ignored; invalid JSON is skipped with a
   // warning.
   pub fn load(explicit_path: &str) -> Config {
@@ -251,7 +251,7 @@ fn user_config_dir() -> Option<String> {
     && !xdg.is_empty()
   {
     return Some(format!(
-      "{}/argvus/removable-devices",
+      "{}/argvus/data/removable-devices",
       xdg.to_string_lossy()
     ));
   }
@@ -259,7 +259,7 @@ fn user_config_dir() -> Option<String> {
     && !home.is_empty()
   {
     return Some(format!(
-      "{}/.config/argvus/removable-devices",
+      "{}/.config/argvus/data/removable-devices",
       home.to_string_lossy()
     ));
   }
@@ -277,7 +277,7 @@ fn legacy_user_config_dirs() -> Vec<String> {
     });
   let Some(base) = base else { return Vec::new() };
   vec![
-    format!("{base}/argvus/taskbar/storage"),
+    format!("{base}/argvus/data/taskbar/storage"),
     format!("{base}/argvus-removable-devices"),
   ]
 }
