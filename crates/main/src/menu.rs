@@ -271,8 +271,10 @@ fn rofi_config_path() -> Option<String> {
   }
   let relative = [
     "rofi/config.rasi",
+    "argvus/data/rofi/config.rasi",
+    "argvus/data/generated/rofi/config.rasi",
+    // Pre-`data/` location, kept so an unmigrated profile still resolves.
     "argvus/rofi/config.rasi",
-    "argvus/generated/rofi/config.rasi",
   ];
   for dir in dirs {
     for rel in relative {
