@@ -145,7 +145,10 @@ impl<'a> Actions<'a> {
       // TUI file managers need a real terminal. Keep the configured
       // command intact so both `spf`/`yazi` and ARGVUS wrappers such as
       // `argvus --spf`/`argvus --yazi` work with the selected directory.
-      format!("foot {}", manager)
+      format!(
+        "argvus-tui-terminal --class argvus-file-manager --term kitty -- {}",
+        manager
+      )
     } else {
       manager.to_string()
     };
