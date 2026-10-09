@@ -1,6 +1,6 @@
 # Maintainer: William C. Canin
 pkgname=argvus-removable-devices
-pkgver=0.2.0
+pkgver=0.1.0
 pkgrel=1
 pkgdesc="Removable storage module for Waybar using UDisks2"
 arch=('x86_64')
