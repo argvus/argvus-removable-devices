@@ -27,7 +27,7 @@ if [ "${1:-}" = "--surface" ] && [ "$#" -ge 3 ] && command -v jq >/dev/null 2>&1
   origin_y="$(printf '%s\n' "$origin_y" | sed -n '/^-\{0,1\}[0-9][0-9]*$/p')"
   bar_height="$(printf '%s\n' "$bar_height" | sed -n '/^-\{0,1\}[0-9][0-9]*$/p')"
   if [ -n "$surface_x" ] && [ -n "$surface_y" ] && [ -n "$origin_x" ] && [ -n "$origin_y" ] && [ -n "$bar_height" ]; then
-    exec argvus-removable-devices menu \
+    exec argvus removable-devices menu \
       --x "$((origin_x + surface_x))" \
       --y "$((origin_y + surface_y))" \
       --bar-bottom "$((origin_y + bar_height))"
@@ -38,7 +38,7 @@ if [ "${1:-}" = "--root" ] && [ "$#" -ge 3 ]; then
   root_x="$(printf '%s\n' "$2" | sed -n '/^-\{0,1\}[0-9][0-9]*$/p')"
   root_y="$(printf '%s\n' "$3" | sed -n '/^-\{0,1\}[0-9][0-9]*$/p')"
   if [ -n "$root_x" ] && [ -n "$root_y" ]; then
-    exec argvus-removable-devices menu --x "$root_x" --y "$root_y"
+    exec argvus removable-devices menu --x "$root_x" --y "$root_y"
   fi
 fi
 
@@ -51,7 +51,7 @@ x="$(printf '%s' "$pos" | sed -n 's/.*"x": *\(-\{0,1\}[0-9][0-9]*\).*/\1/p' || t
 y="$(printf '%s' "$pos" | sed -n 's/.*"y": *\(-\{0,1\}[0-9][0-9]*\).*/\1/p' || true)"
 
 if [ -n "$x" ] && [ -n "$y" ]; then
-  exec argvus-removable-devices menu --x "$x" --y "$y"
+  exec argvus removable-devices menu --x "$x" --y "$y"
 fi
 
-exec argvus-removable-devices menu
+exec argvus removable-devices menu

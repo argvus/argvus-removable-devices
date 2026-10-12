@@ -146,7 +146,7 @@ impl<'a> Actions<'a> {
       // command intact so both `spf`/`yazi` and ARGVUS wrappers such as
       // `argvus --spf`/`argvus --yazi` work with the selected directory.
       format!(
-        "argvus-tui-terminal --class argvus-file-manager --term kitty -- {}",
+        "argvus tui-terminal --class argvus-file-manager --term kitty -- {}",
         manager
       )
     } else {

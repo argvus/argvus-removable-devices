@@ -32,7 +32,7 @@ check() {
 package() {
   cd "$(_source_dir)"
 
-  install -Dm755 "target/release/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  install -Dm755 "target/release/${pkgname}" "${pkgdir}/usr/lib/argvus/commands/${pkgname}"
   install -Dm755 resources/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh \
     "${pkgdir}/usr/share/argvus/removable-devices/sh/removable-devices-menu.sh"
   install -Dm644 resources/etc/argvus/removable-devices/config.json \
